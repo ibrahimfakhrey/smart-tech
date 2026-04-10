@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}طلب عرض سعر | سما تكنولوجي{% endblock %}
+
+{% block extra_css %}
+{% if config.RECAPTCHA_PUBLIC_KEY %}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>طلب عرض سعر</h1>
+        <p>أملأ النموذج وسنتواصل معك خلال 24-48 ساعة عمل</p>
+    </div>
+</section>
+
+<section class="section bg-white-section">
+    <div class="container" style="max-width:700px;">
+        <!-- Linked Product (RFQ-03) -->
+        {% if product is defined and product %}
+        <div class="d-flex align-items-center gap-3 p-3 mb-4" style="background:var(--bg-light);border-radius:var(--radius-md);">
+            {% if product.primary_image %}
+            <img src="{{ url_for('static', filename=product.primary_image.image_path) }}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;">
+            {% endif %}
+            <div>
+                <strong>{{ product.name_ar }}</strong><br>
+                <small class="text-muted">{{ product.brand.name }} | {{ product.sku }}</small>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if products is defined and products %}
+        <div class="mb-4 p-3" style="background:var(--bg-light);border-radius:var(--radius-md);">
+            <strong>المنتجات المطلوبة ({{ products|length }}):</strong>
+            <ul class="mb-0 mt-2">
+                {% for p in products %}
+                <li>{{ p.name_ar }} ({{ p.sku }})</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form method="POST" novalidate>
+            {{ form.hidden_tag() }}
+            {% if products is defined and products %}
+                {% for p in products %}
+                <input type="hidden" name="product_ids" value="{{ p.id }}">
+                {% endfor %}
+            {% endif %}
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.full_name.label.text }} *</label>
+                    {{ form.full_name(class="form-control", placeholder="الاسم الكامل") }}
+                    {% for error in form.full_name.errors %}
+                    <div class="text-danger" style="font-size:0.85rem;">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.company_name.label.text }} *</label>
+                    {{ form.company_name(class="form-control", placeholder="اسم الشركة أو الجهة") }}
+                    {% for error in form.company_name.errors %}
+                    <div class="text-danger" style="font-size:0.85rem;">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.email.label.text }} *</label>
+                    {{ form.email(class="form-control", placeholder="example@company.com", dir="ltr") }}
+                    {% for error in form.email.errors %}
+                    <div class="text-danger" style="font-size:0.85rem;">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.phone.label.text }} *</label>
+                    {{ form.phone(class="form-control", placeholder="05XXXXXXXX", dir="ltr") }}
+                    {% for error in form.phone.errors %}
+                    <div class="text-danger" style="font-size:0.85rem;">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-12">
+                    <label class="form-label">{{ form.notes.label.text }}</label>
+                    {{ form.notes(class="form-control", rows="4", placeholder="أي تفاصيل إضافية عن طلبك...") }}
+                </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        {{ form.privacy_accepted(class="form-check-input") }}
+                        <label class="form-check-label" style="font-size:0.9rem;">
+                            أوافق على <a href="{{ url_for('main_bp.privacy') }}" target="_blank">سياسة الخصوصية</a> واستخدام بياناتي للتواصل بشأن هذا الطلب
+                        </label>
+                    </div>
+                    {% for error in form.privacy_accepted.errors %}
+                    <div class="text-danger" style="font-size:0.85rem;">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% if config.RECAPTCHA_PUBLIC_KEY %}
+                <div class="col-12">
+                    <div class="g-recaptcha" data-sitekey="{{ config.RECAPTCHA_PUBLIC_KEY }}"></div>
+                    {% if recaptcha_error is defined and recaptcha_error %}
+                    <div class="text-danger" style="font-size:0.85rem;">يرجى التحقق من أنك لست روبوت</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="bi bi-send ms-2"></i> إرسال الطلب
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

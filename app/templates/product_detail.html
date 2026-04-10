@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name_ar }} | سما تكنولوجي{% endblock %}
+{% block meta_description %}{{ product.short_description_ar or product.name_ar }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb (PD-10) -->
+<section class="breadcrumb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main_bp.home') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('catalog_bp.product_list') }}">المنتجات</a></li>
+                {% if product.category.parent %}
+                <li class="breadcrumb-item"><a href="{{ url_for('catalog_bp.category_products', category_slug=product.category.parent.slug) }}">{{ product.category.parent.name_ar }}</a></li>
+                {% endif %}
+                <li class="breadcrumb-item"><a href="{{ url_for('catalog_bp.category_products', category_slug=product.category.slug) }}">{{ product.category.name_ar }}</a></li>
+                <li class="breadcrumb-item active">{{ product.name_ar }}</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<section class="section" style="padding-top:20px;">
+    <div class="container">
+        <div class="row g-5">
+            <!-- Image Gallery (PD-01) -->
+            <div class="col-lg-5">
+                <div class="product-gallery">
+                    <div class="main-image mb-3" style="background:var(--bg-light);border-radius:var(--radius-lg);overflow:hidden;padding-top:100%;position:relative;">
+                        {% set main_img = product.primary_image %}
+                        <img id="mainProductImage" src="{{ url_for('static', filename=main_img.image_path) if main_img else 'https://placehold.co/600x600/e2e8f0/94a3b8?text=' + product.brand.name }}"
+                             alt="{{ product.name_ar }}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;cursor:zoom-in;" onclick="this.classList.toggle('zoomed')">
+                    </div>
+                    {% if product.images.count() > 1 %}
+                    <div class="d-flex gap-2 flex-wrap">
+                        {% for img in product.images %}
+                        <div class="thumbnail" onclick="document.getElementById('mainProductImage').src=this.querySelector('img').src"
+                             style="width:70px;height:70px;border-radius:var(--radius-sm);overflow:hidden;border:2px solid var(--border-color);cursor:pointer;">
+                            <img src="{{ url_for('static', filename=img.image_path) }}" style="width:100%;height:100%;object-fit:cover;">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="col-lg-7">
+                <!-- Basic Info (PD-02) -->
+                <span class="badge mb-2" style="background:rgba(8,145,178,0.1);color:var(--primary);">{{ product.brand.name }}</span>
+                <h1 style="font-size:1.8rem;margin-bottom:8px;">{{ product.name_ar }}</h1>
+                <p class="text-muted mb-3" dir="ltr" style="text-align:right;">SKU: {{ product.sku }}</p>
+
+                {% if product.short_description_ar %}
+                <p style="line-height:1.9;margin-bottom:24px;">{{ product.short_description_ar }}</p>
+                {% endif %}
+
+                <!-- RFQ CTA (PD-06) - MOST IMPORTANT -->
+                <div class="d-flex gap-3 flex-wrap mb-4" id="productCTA">
+                    <a href="{{ url_for('rfq_bp.request_quote', product_id=product.id) }}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-chat-dots-fill ms-2"></i> اطلب عرض سعر
+                    </a>
+                    <button class="btn btn-outline-primary btn-lg wishlist-btn" data-product-id="{{ product.id }}" data-product-name="{{ product.name_ar }}" onclick="toggleWishlist(this)">
+                        <i class="bi bi-heart ms-2"></i> المفضلة
+                    </button>
+                    <button class="btn btn-outline-primary btn-lg compare-btn" data-product-id="{{ product.id }}" data-product-name="{{ product.name_ar }}" onclick="toggleCompare(this)">
+                        <i class="bi bi-arrow-left-right ms-2"></i> مقارنة
+                    </button>
+                </div>
+
+                <!-- Shipping Info (PD-05) -->
+                {% if shipping_info %}
+                <div class="alert d-flex align-items-center gap-2" style="background:rgba(16,185,129,0.08);border:none;border-radius:var(--radius-sm);color:#059669;font-size:0.9rem;">
+                    <i class="bi bi-truck"></i>
+                    <div>
+                        <strong>{{ shipping_info.delivery_area_ar }}</strong> - {{ shipping_info.estimated_days }}<br>
+                        <small>{{ shipping_info.coverage_regions_ar }}</small>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Technical Specs (PD-03) -->
+                {% if product.specs_json %}
+                <div class="mt-4">
+                    <h4 style="font-size:1.1rem;margin-bottom:16px;">المواصفات التقنية</h4>
+                    <table class="table table-striped" style="font-size:0.9rem;">
+                        <tbody>
+                            {% for key, value in product.specs_json.items() %}
+                            <tr>
+                                <td style="font-weight:600;width:40%;color:var(--text-dark);">{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+
+                <!-- Product Documents (PD-04) -->
+                {% set docs = product.documents.all() %}
+                {% if docs %}
+                <div class="mt-4">
+                    <h4 style="font-size:1.1rem;margin-bottom:16px;">وثائق المنتج</h4>
+                    <div class="d-flex gap-3 flex-wrap">
+                        {% for doc in docs %}
+                        <a href="{{ url_for('static', filename=doc.file_path) }}" class="btn btn-outline-primary btn-sm" target="_blank">
+                            <i class="bi bi-file-earmark-pdf ms-2"></i>
+                            {% if doc.doc_type == 'datasheet' %}Data Sheet{% elif doc.doc_type == 'manual' %}User Manual{% else %}Brochure{% endif %}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if product.full_description_ar %}
+                <div class="mt-4">
+                    <h4 style="font-size:1.1rem;margin-bottom:16px;">وصف المنتج</h4>
+                    <p style="line-height:2;color:var(--text-body);">{{ product.full_description_ar }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Related Products (PD-09) -->
+        {% if related_products %}
+        <div class="mt-5 pt-5" style="border-top:1px solid var(--border-color);">
+            <h3 class="mb-4">قد يعجبك أيضاً</h3>
+            <div class="row g-3">
+                {% for rp in related_products %}
+                <div class="col-6 col-md-3">
+                    <div class="product-card">
+                        <div class="product-card-img">
+                            {% if rp.primary_image %}
+                            <img src="{{ url_for('static', filename=rp.primary_image.image_path) }}" alt="{{ rp.name_ar }}" loading="lazy">
+                            {% else %}
+                            <img src="https://placehold.co/400x300/e2e8f0/94a3b8?text={{ rp.brand.name }}" alt="{{ rp.name_ar }}" loading="lazy">
+                            {% endif %}
+                        </div>
+                        <div class="product-card-body">
+                            <span class="product-card-brand">{{ rp.brand.name }}</span>
+                            <h5 class="product-card-title">{{ rp.name_ar }}</h5>
+                            <div class="product-card-footer">
+                                <a href="{{ url_for('catalog_bp.product_detail', category_slug=rp.category.parent.slug if rp.category.parent else rp.category.slug, product_slug=rp.slug) }}" class="product-card-link">
+                                    اعرف أكثر <i class="bi bi-arrow-left"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Sticky RFQ Button on scroll (PD-06) -->
+<style>
+    .sticky-product-cta {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+        padding: 12px 0; box-shadow: 0 -4px 20px rgba(0,0,0,.1);
+        z-index: 1030; display: none;
+    }
+    .sticky-product-cta.visible { display: block; }
+    .zoomed { transform: scale(1.5); transition: transform 0.3s; }
+</style>
+<div class="sticky-product-cta" id="stickyProductCta">
+    <div class="container d-flex align-items-center justify-content-between">
+        <div>
+            <strong style="font-size:0.9rem;">{{ product.name_ar }}</strong>
+            <span class="text-muted" style="font-size:0.8rem;margin-right:8px;">{{ product.brand.name }}</span>
+        </div>
+        <a href="{{ url_for('rfq_bp.request_quote', product_id=product.id) }}" class="btn btn-primary">
+            اطلب عرض سعر
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Schema.org (SEO-03)
+var schema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": {{ product.name_ar|tojson }},
+    "sku": {{ product.sku|tojson }},
+    "brand": {"@type": "Brand", "name": {{ product.brand.name|tojson }}},
+    "category": {{ product.category.name_ar|tojson }},
+    "description": {{ (product.short_description_ar or '')|tojson }}
+};
+var s = document.createElement('script');
+s.type = 'application/ld+json';
+s.textContent = JSON.stringify(schema);
+document.head.appendChild(s);
+
+// Sticky CTA on scroll
+var cta = document.getElementById('productCTA');
+var stickyCta = document.getElementById('stickyProductCta');
+if (cta && stickyCta) {
+    window.addEventListener('scroll', function() {
+        var rect = cta.getBoundingClientRect();
+        stickyCta.classList.toggle('visible', rect.bottom < 0);
+    }, { passive: true });
+}
+</script>
+{% endblock %}

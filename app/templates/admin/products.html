@@ -1,0 +1,87 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}المنتجات{% endblock %}
+
+{% block admin_content %}
+<div class="top-bar">
+    <h3>المنتجات</h3>
+    <a href="{{ url_for('admin_bp.product_add') }}" class="btn btn-primary"><i class="bi bi-plus-lg ms-1"></i> إضافة منتج</a>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white py-3">
+        <form method="GET" class="d-flex gap-2 flex-wrap">
+            <input type="text" name="q" class="form-control form-control-sm" style="max-width:200px;" placeholder="بحث..." value="{{ request.args.get('q', '') }}">
+            <select name="category" class="form-select form-select-sm" style="max-width:180px;" onchange="this.form.submit()">
+                <option value="">كل التصنيفات</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {{ 'selected' if request.args.get('category', type=int) == cat.id }}>{{ cat.name_ar }}</option>
+                {% endfor %}
+            </select>
+            <select name="brand" class="form-select form-select-sm" style="max-width:160px;" onchange="this.form.submit()">
+                <option value="">كل العلامات</option>
+                {% for b in brands %}
+                <option value="{{ b.id }}" {{ 'selected' if request.args.get('brand', type=int) == b.id }}>{{ b.name }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-sm btn-outline-primary">بحث</button>
+        </form>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead style="background:#f8fafc;">
+                    <tr><th>#</th><th>المنتج</th><th>SKU</th><th>التصنيف</th><th>العلامة</th><th>مميز</th><th>الحالة</th><th>مشاهدات</th><th>إجراءات</th></tr>
+                </thead>
+                <tbody>
+                    {% for product in products.items %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                {% if product.primary_image %}
+                                <img src="{{ url_for('static', filename=product.primary_image.image_path) }}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;">
+                                {% endif %}
+                                <span style="font-size:.9rem;">{{ product.name_ar[:40] }}</span>
+                            </div>
+                        </td>
+                        <td dir="ltr">{{ product.sku }}</td>
+                        <td>{{ product.category.name_ar }}</td>
+                        <td>{{ product.brand.name }}</td>
+                        <td>{{ '⭐' if product.is_featured else '-' }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin_bp.product_toggle', product_id=product.id) }}" style="display:inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-sm {{ 'btn-success' if product.is_active else 'btn-secondary' }}" style="font-size:.75rem;">
+                                    {{ 'مفعل' if product.is_active else 'مخفي' }}
+                                </button>
+                            </form>
+                        </td>
+                        <td>{{ product.views_count or 0 }}</td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{{ url_for('admin_bp.product_edit', product_id=product.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                                <form method="POST" action="{{ url_for('admin_bp.product_delete', product_id=product.id) }}" onsubmit="return confirm('هل أنت متأكد من حذف هذا المنتج؟')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="9" class="text-center py-4 text-muted">لا توجد منتجات</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% if products.pages > 1 %}
+    <div class="card-footer bg-white">
+        <nav><ul class="pagination pagination-sm justify-content-center mb-0">
+            {% for p in products.iter_pages() %}
+                {% if p %}<li class="page-item {{ 'active' if p == products.page }}"><a class="page-link" href="?page={{ p }}">{{ p }}</a></li>{% endif %}
+            {% endfor %}
+        </ul></nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

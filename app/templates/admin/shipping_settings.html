@@ -1,0 +1,49 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}إعدادات الشحن{% endblock %}
+
+{% block admin_content %}
+<div class="top-bar"><h3>إعدادات الشحن والتوصيل</h3></div>
+
+{% for ship in shipping %}
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="id" value="{{ ship.id }}">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">منطقة التوصيل</label>
+                    <input type="text" name="delivery_area_ar" class="form-control" value="{{ ship.delivery_area_ar }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">المدة التقديرية</label>
+                    <input type="text" name="estimated_days" class="form-control" value="{{ ship.estimated_days }}">
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">مناطق التغطية</label>
+                    <input type="text" name="coverage_regions_ar" class="form-control" value="{{ ship.coverage_regions_ar }}">
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary btn-sm">حفظ</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endfor %}
+
+<div class="card">
+    <div class="card-header bg-white"><h5 class="mb-0 fw-bold">إضافة منطقة شحن جديدة</h5></div>
+    <div class="card-body">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="row g-3">
+                <div class="col-md-4"><input type="text" name="delivery_area_ar" class="form-control" placeholder="منطقة التوصيل" required></div>
+                <div class="col-md-3"><input type="text" name="estimated_days" class="form-control" placeholder="المدة التقديرية"></div>
+                <div class="col-md-5"><input type="text" name="coverage_regions_ar" class="form-control" placeholder="مناطق التغطية"></div>
+                <div class="col-12"><button class="btn btn-primary btn-sm">إضافة</button></div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}العلامات التجارية{% endblock %}
+
+{% block admin_content %}
+<div class="top-bar">
+    <h3>العلامات التجارية</h3>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBrandModal"><i class="bi bi-plus-lg ms-1"></i> إضافة علامة</button>
+</div>
+
+<div class="row g-3">
+    {% for brand in brands %}
+    <div class="col-md-4 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                {% if brand.logo_path %}
+                <img src="{{ url_for('static', filename=brand.logo_path) }}" style="max-height:50px;margin-bottom:12px;">
+                {% else %}
+                <h5 class="mb-2">{{ brand.name }}</h5>
+                {% endif %}
+                <p class="text-muted mb-2" style="font-size:.8rem;">{{ brand.product_count }} منتج</p>
+                <p class="text-muted" style="font-size:.8rem;">{{ (brand.description_ar or '')[:60] }}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Add Brand Modal -->
+<div class="modal fade" id="addBrandModal" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+        <form method="POST" action="{{ url_for('admin_bp.brand_add') }}" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="modal-header"><h5 class="modal-title">إضافة علامة تجارية</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="mb-3"><label class="form-label">الاسم *</label><input type="text" name="name" class="form-control" required></div>
+                <div class="mb-3"><label class="form-label">الوصف</label><textarea name="description_ar" class="form-control" rows="3"></textarea></div>
+                <div class="mb-3"><label class="form-label">رابط الموقع</label><input type="url" name="website_url" class="form-control" dir="ltr"></div>
+                <div class="mb-3"><label class="form-label">الشعار</label><input type="file" name="logo" class="form-control" accept="image/*"></div>
+            </div>
+            <div class="modal-footer"><button type="submit" class="btn btn-primary">إضافة</button></div>
+        </form>
+    </div></div>
+</div>
+{% endblock %}

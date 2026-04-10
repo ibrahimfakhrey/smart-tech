@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}اتصل بنا | سما تكنولوجي{% endblock %}
+{% block meta_description %}تواصل مع سما تكنولوجي للحصول على عرض سعر أو استشارة تقنية{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>اتصل بنا</h1>
+        <p>نسعد بتواصلك معنا ومساعدتك في إيجاد الحلول التقنية المناسبة</p>
+    </div>
+</section>
+
+<section class="section bg-white-section">
+    <div class="container">
+        <div class="row g-5">
+            <!-- Contact Form -->
+            <div class="col-lg-7">
+                <h3 class="mb-4">أرسل لنا رسالة</h3>
+                <form id="contactForm" method="POST" action="{{ url_for('main_bp.contact') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">الاسم الكامل *</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">اسم الشركة</label>
+                            <input type="text" class="form-control" name="company">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">البريد الإلكتروني *</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">رقم الجوال *</label>
+                            <input type="tel" class="form-control" name="phone" required dir="ltr">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">الرسالة *</label>
+                            <textarea class="form-control" name="message" rows="5" required placeholder="اكتب رسالتك هنا..."></textarea>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-send ms-2"></i> إرسال الرسالة
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="col-lg-5">
+                <h3 class="mb-4">معلومات التواصل</h3>
+
+                <div class="d-flex flex-column gap-4">
+                    <div class="why-card">
+                        <div class="why-card-icon"><i class="bi bi-telephone-fill"></i></div>
+                        <div>
+                            <h5>الهاتف</h5>
+                            <p dir="ltr" style="text-align:right;">
+                                <a href="tel:{{ config.COMPANY_PHONE_1 }}" style="color:var(--text-body);">{{ config.COMPANY_PHONE_1 }}</a><br>
+                                <a href="tel:{{ config.COMPANY_PHONE_2 }}" style="color:var(--text-body);">{{ config.COMPANY_PHONE_2 }}</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="why-card">
+                        <div class="why-card-icon"><i class="bi bi-envelope-fill"></i></div>
+                        <div>
+                            <h5>البريد الإلكتروني</h5>
+                            <p><a href="mailto:{{ config.COMPANY_EMAIL }}" style="color:var(--text-body);">{{ config.COMPANY_EMAIL }}</a></p>
+                        </div>
+                    </div>
+
+                    <div class="why-card">
+                        <div class="why-card-icon"><i class="bi bi-globe2"></i></div>
+                        <div>
+                            <h5>الموقع الإلكتروني</h5>
+                            <p style="color:var(--text-body);">{{ config.COMPANY_WEBSITE }}</p>
+                        </div>
+                    </div>
+
+                    <div class="why-card">
+                        <div class="why-card-icon"><i class="bi bi-clock-fill"></i></div>
+                        <div>
+                            <h5>ساعات العمل</h5>
+                            <p style="color:var(--text-body);">الأحد - الخميس: 9 صباحاً - 6 مساءً</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{{ 'تعديل المنتج' if is_edit else 'إضافة منتج' }}{% endblock %}
+
+{% block admin_content %}
+<div class="top-bar">
+    <h3>{{ 'تعديل المنتج' if is_edit else 'إضافة منتج جديد' }}</h3>
+    <a href="{{ url_for('admin_bp.products_list') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-right ms-1"></i> رجوع</a>
+</div>
+
+<form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-white"><h5 class="mb-0 fw-bold">معلومات المنتج</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">اسم المنتج *</label>
+                            {{ form.name_ar(class="form-control") }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">رمز المنتج (SKU) *</label>
+                            {{ form.sku(class="form-control", dir="ltr") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">التصنيف *</label>
+                            {{ form.category_id(class="form-select") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">العلامة التجارية *</label>
+                            {{ form.brand_id(class="form-select") }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">وصف مختصر</label>
+                            {{ form.short_description_ar(class="form-control", rows="3") }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">وصف تفصيلي</label>
+                            {{ form.full_description_ar(class="form-control", rows="5") }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-white"><h5 class="mb-0 fw-bold">المواصفات التقنية</h5></div>
+                <div class="card-body">
+                    <label class="form-label">أدخل المواصفات بصيغة JSON</label>
+                    {{ form.specs_json(class="form-control", rows="6", dir="ltr", placeholder='{"الحجم": "65 بوصة", "الدقة": "4K"}') }}
+                    <small class="text-muted">مثال: {"الحجم": "65 بوصة", "الدقة": "4K UHD"}</small>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-white"><h5 class="mb-0 fw-bold">الصور</h5></div>
+                <div class="card-body">
+                    {% if is_edit and product %}
+                    <div class="d-flex gap-2 flex-wrap mb-3">
+                        {% for img in product.images %}
+                        <div class="position-relative" style="width:100px;">
+                            <img src="{{ url_for('static', filename=img.image_path) }}" style="width:100px;height:100px;object-fit:cover;border-radius:8px;border:2px solid {{ '#0891b2' if img.is_primary else '#e2e8f0' }};">
+                            <div class="d-flex gap-1 mt-1">
+                                <form method="POST" action="{{ url_for('admin_bp.set_primary_image', image_id=img.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button class="btn btn-xs btn-outline-primary" style="font-size:.65rem;padding:2px 6px;">{{ 'رئيسية' if img.is_primary else 'تعيين' }}</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('admin_bp.delete_product_image', image_id=img.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button class="btn btn-xs btn-outline-danger" style="font-size:.65rem;padding:2px 6px;">حذف</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <input type="file" name="images" class="form-control" multiple accept="image/*">
+                    <small class="text-muted">يمكنك رفع عدة صور. أول صورة ستكون الرئيسية.</small>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-white"><h5 class="mb-0 fw-bold">وثائق المنتج (PDF)</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Data Sheet</label>
+                            <input type="file" name="doc_datasheet" class="form-control form-control-sm" accept=".pdf">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">User Manual</label>
+                            <input type="file" name="doc_manual" class="form-control form-control-sm" accept=".pdf">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Brochure</label>
+                            <input type="file" name="doc_brochure" class="form-control form-control-sm" accept=".pdf">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-white"><h5 class="mb-0 fw-bold">النشر</h5></div>
+                <div class="card-body">
+                    <div class="form-check mb-3">
+                        {{ form.is_active(class="form-check-input") }}
+                        <label class="form-check-label fw-bold">مفعل (ظاهر في الموقع)</label>
+                    </div>
+                    <div class="form-check mb-3">
+                        {{ form.is_featured(class="form-check-input") }}
+                        <label class="form-check-label fw-bold">منتج مميز</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-check-lg ms-1"></i> {{ 'حفظ التعديلات' if is_edit else 'إضافة المنتج' }}
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-white"><h5 class="mb-0 fw-bold">معلومات الشحن</h5></div>
+                <div class="card-body">
+                    {{ form.shipping_info(class="form-control", rows="3", placeholder="معلومات شحن خاصة بهذا المنتج (اختياري)") }}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

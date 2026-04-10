@@ -1,0 +1,49 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}الطلبات{% endblock %}
+
+{% block admin_content %}
+<div class="top-bar">
+    <h3>طلبات عروض الأسعار</h3>
+    <a href="{{ url_for('admin_bp.orders_export') }}" class="btn btn-outline-primary"><i class="bi bi-download ms-1"></i> تصدير Excel</a>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white py-3">
+        <form method="GET" class="d-flex gap-2 flex-wrap">
+            <input type="text" name="q" class="form-control form-control-sm" style="max-width:200px;" placeholder="بحث..." value="{{ request.args.get('q', '') }}">
+            <select name="status" class="form-select form-select-sm" style="max-width:150px;" onchange="this.form.submit()">
+                <option value="">كل الحالات</option>
+                <option value="new" {{ 'selected' if request.args.get('status') == 'new' }}>جديد</option>
+                <option value="reviewing" {{ 'selected' if request.args.get('status') == 'reviewing' }}>قيد المراجعة</option>
+                <option value="replied" {{ 'selected' if request.args.get('status') == 'replied' }}>تم الرد</option>
+                <option value="closed" {{ 'selected' if request.args.get('status') == 'closed' }}>مغلق</option>
+            </select>
+            <button class="btn btn-sm btn-outline-primary">بحث</button>
+        </form>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead style="background:#f8fafc;">
+                    <tr><th>المرجع</th><th>الاسم</th><th>البريد</th><th>الشركة</th><th>المنتج</th><th>الحالة</th><th>التاريخ</th></tr>
+                </thead>
+                <tbody>
+                    {% for order in orders.items %}
+                    <tr onclick="window.location='{{ url_for('admin_bp.order_detail', order_id=order.id) }}'" style="cursor:pointer;">
+                        <td><strong>{{ order.ref_number }}</strong></td>
+                        <td>{{ order.full_name }}</td>
+                        <td dir="ltr" style="text-align:right;">{{ order.email }}</td>
+                        <td>{{ order.company_name }}</td>
+                        <td>{{ order.product.name_ar[:25] if order.product else 'متعدد' }}</td>
+                        <td><span class="badge badge-{{ order.status }}">{{ order.status_ar }}</span></td>
+                        <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="text-center py-4 text-muted">لا توجد طلبات</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

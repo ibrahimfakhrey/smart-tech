@@ -1,0 +1,56 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}إعدادات الصفحة الرئيسية{% endblock %}
+
+{% block admin_content %}
+<div class="top-bar"><h3>إعدادات الصفحة الرئيسية</h3></div>
+
+<form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="card mb-4">
+        <div class="card-header bg-white"><h5 class="mb-0 fw-bold">أرقام وإنجازات (Social Proof)</h5></div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">سنوات الخبرة</label>
+                    <input type="text" name="years_experience" class="form-control" value="{{ info.get('years_experience', '10+') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">عدد العملاء</label>
+                    <input type="text" name="clients_count" class="form-control" value="{{ info.get('clients_count', '500+') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">عدد المنتجات</label>
+                    <input type="text" name="products_count" class="form-control" value="{{ info.get('products_count', '200+') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">التغطية</label>
+                    <input type="text" name="coverage" class="form-control" value="{{ info.get('coverage', 'السعودية والخليج') }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-white"><h5 class="mb-0 fw-bold">المنتجات المميزة في الرئيسية</h5></div>
+        <div class="card-body">
+            <p class="text-muted mb-3">اختر المنتجات التي تريد عرضها في الصفحة الرئيسية</p>
+            <div class="row g-2">
+                {% for product in products %}
+                <div class="col-md-4 col-lg-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="featured_products" value="{{ product.id }}"
+                            id="fp-{{ product.id }}" {{ 'checked' if product.id in featured_ids }}>
+                        <label class="form-check-label" for="fp-{{ product.id }}" style="font-size:.85rem;">
+                            {{ product.name_ar[:35] }}
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg"><i class="bi bi-check-lg ms-1"></i> حفظ الإعدادات</button>
+</form>
+{% endblock %}

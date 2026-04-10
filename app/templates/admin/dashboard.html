@@ -1,0 +1,66 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}لوحة التحكم{% endblock %}
+
+{% block admin_content %}
+<div class="top-bar">
+    <h3>لوحة التحكم</h3>
+    <a href="{{ url_for('admin_bp.product_add') }}" class="btn btn-primary"><i class="bi bi-plus-lg ms-1"></i> إضافة منتج</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-num">{{ total_products }}</div>
+            <div class="stat-lbl">إجمالي المنتجات</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-num">{{ active_products }}</div>
+            <div class="stat-lbl">منتجات مفعلة</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-num">{{ total_orders }}</div>
+            <div class="stat-lbl">إجمالي الطلبات</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-num" style="color:#ef4444;">{{ new_orders }}</div>
+            <div class="stat-lbl">طلبات جديدة</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <h5 class="mb-0 fw-bold">آخر الطلبات</h5>
+        <a href="{{ url_for('admin_bp.orders_list') }}" class="btn btn-sm btn-outline-primary">عرض الكل</a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead style="background:#f8fafc;">
+                    <tr><th>المرجع</th><th>الاسم</th><th>الشركة</th><th>المنتج</th><th>الحالة</th><th>التاريخ</th></tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr onclick="window.location='{{ url_for('admin_bp.order_detail', order_id=order.id) }}'" style="cursor:pointer;">
+                        <td><strong>{{ order.ref_number }}</strong></td>
+                        <td>{{ order.full_name }}</td>
+                        <td>{{ order.company_name }}</td>
+                        <td>{{ order.product.name_ar[:30] if order.product else 'متعدد' }}...</td>
+                        <td><span class="badge badge-{{ order.status }}">{{ order.status_ar }}</span></td>
+                        <td>{{ order.created_at.strftime('%Y-%m-%d') }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center py-4 text-muted">لا توجد طلبات بعد</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

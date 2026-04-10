@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}سما تكنولوجي | Sama Technology{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}سما تكنولوجي - شريكك التقني الموثوق لحلول الاتصالات والبنية التحتية الذكية. توريد وتركيب الشاشات التفاعلية، أجهزة مؤتمرات الفيديو، هواتف IP، والمزيد.{% endblock %}">
+    <meta name="keywords" content="سما تك, Sama Technology, شاشات تفاعلية, مؤتمرات فيديو, هواتف IP, VoIP, السعودية">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% block og_title %}سما تكنولوجي - Plug Into The Future{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}حلول الاتصالات والبنية التحتية الذكية{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="ar_SA">
+    <link rel="canonical" href="{{ request.url }}">
+
+    <!-- Bootstrap 5 RTL -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts - Arabic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('main_bp.home') }}">
+                <span class="brand-text">SAMA TECHNOLOGY</span>
+                <small class="brand-tagline d-none d-md-inline">Plug Into The Future</small>
+            </a>
+
+            <div class="d-flex align-items-center order-lg-last gap-2">
+                <!-- Search Toggle -->
+                <button class="btn btn-link nav-icon" id="searchToggle" aria-label="بحث">
+                    <i class="bi bi-search"></i>
+                </button>
+                <!-- Wishlist -->
+                <a href="{{ url_for('main_bp.home') }}#" class="btn btn-link nav-icon position-relative" id="wishlistNavBtn" onclick="openWishlistPage(event)">
+                    <i class="bi bi-heart"></i>
+                    <span class="badge bg-primary wishlist-count" id="wishlistCount" style="display:none;">0</span>
+                </a>
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main_bp.home') }}">الرئيسية</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="{{ url_for('catalog_bp.product_list') }}" id="productsDropdown" role="button" data-bs-toggle="dropdown">
+                            المنتجات
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('catalog_bp.product_list') }}">جميع المنتجات</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            {% for cat in nav_categories %}
+                            <li><a class="dropdown-item" href="{{ url_for('catalog_bp.category_products', category_slug=cat.slug) }}">
+                                <i class="{{ cat.icon }} ms-2"></i> {{ cat.name_ar }}
+                            </a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main_bp.about') }}">من نحن</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main_bp.contact') }}">اتصل بنا</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay">
+        <div class="container">
+            <div class="search-overlay-inner">
+                <button class="btn-close btn-close-white search-close" id="searchClose"></button>
+                <form action="{{ url_for('catalog_bp.product_list') }}" method="GET" class="search-form">
+                    <div class="input-group input-group-lg">
+                        <input type="text" name="q" class="form-control" id="globalSearchInput" placeholder="ابحث عن منتج، رمز، أو علامة تجارية..." autocomplete="off">
+                        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
+                    </div>
+                </form>
+                <div id="searchResults" class="search-results"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Company Info -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="footer-brand">
+                        <h4>SAMA TECHNOLOGY</h4>
+                        <p class="text-muted-light">Plug Into The Future</p>
+                    </div>
+                    <p class="footer-desc">
+                        {{ company_info.get('about_ar', 'سما تكنولوجي - شريكك التقني الموثوق لحلول الاتصالات والبنية التحتية الذكية')[:150] }}...
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="footer-heading">روابط سريعة</h5>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('main_bp.home') }}">الرئيسية</a></li>
+                        <li><a href="{{ url_for('catalog_bp.product_list') }}">المنتجات</a></li>
+                        <li><a href="{{ url_for('main_bp.about') }}">من نحن</a></li>
+                        <li><a href="{{ url_for('main_bp.contact') }}">اتصل بنا</a></li>
+                        <li><a href="{{ url_for('main_bp.privacy') }}">سياسة الخصوصية</a></li>
+                    </ul>
+                </div>
+
+                <!-- Categories -->
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="footer-heading">التصنيفات</h5>
+                    <ul class="footer-links">
+                        {% for cat in nav_categories %}
+                        <li><a href="{{ url_for('catalog_bp.category_products', category_slug=cat.slug) }}">{{ cat.name_ar }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="footer-heading">تواصل معنا</h5>
+                    <ul class="footer-contact">
+                        <li>
+                            <i class="bi bi-telephone-fill"></i>
+                            <div>
+                                <a href="tel:{{ config.COMPANY_PHONE_1 }}" dir="ltr">{{ config.COMPANY_PHONE_1 }}</a><br>
+                                <a href="tel:{{ config.COMPANY_PHONE_2 }}" dir="ltr">{{ config.COMPANY_PHONE_2 }}</a>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="bi bi-envelope-fill"></i>
+                            <a href="mailto:{{ config.COMPANY_EMAIL }}">{{ config.COMPANY_EMAIL }}</a>
+                        </li>
+                        <li>
+                            <i class="bi bi-globe2"></i>
+                            <span>{{ config.COMPANY_WEBSITE }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <hr class="footer-divider">
+
+            <div class="footer-bottom">
+                <p>&copy; {{ 2026 }} سما تكنولوجي. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Sticky CTA (LP-07) -->
+    <div class="sticky-cta" id="stickyCta">
+        <a href="{{ url_for('main_bp.contact') }}" class="btn btn-primary btn-lg sticky-cta-btn">
+            <i class="bi bi-chat-dots-fill"></i>
+            <span>اطلب عرض سعر</span>
+        </a>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 start-0 p-3" id="toastContainer"></div>
+
+    <!-- Compare Bar -->
+    <div class="compare-bar" id="compareBar">
+        <div class="container d-flex align-items-center justify-content-between">
+            <div class="compare-items d-flex gap-3" id="compareItems"></div>
+            <div class="compare-actions">
+                <a href="#" class="btn btn-primary btn-sm" id="compareNowBtn">قارن الآن</a>
+                <button class="btn btn-outline-light btn-sm" id="clearCompareBtn">مسح</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Main JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

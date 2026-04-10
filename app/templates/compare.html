@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}مقارنة المنتجات | سما تكنولوجي{% endblock %}
+
+{% block content %}
+<section class="breadcrumb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main_bp.home') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('catalog_bp.product_list') }}">المنتجات</a></li>
+                <li class="breadcrumb-item active">مقارنة</li>
+            </ol>
+        </nav>
+        <h1 style="font-size:1.8rem;margin-top:8px;">مقارنة المنتجات</h1>
+    </div>
+</section>
+
+<section class="section" style="padding-top:20px;">
+    <div class="container">
+        {% if products|length >= 2 %}
+        <div class="table-responsive">
+            <table class="table table-bordered" style="background:#fff;border-radius:var(--radius-lg);overflow:hidden;">
+                <tbody>
+                    <!-- Images -->
+                    <tr>
+                        <td class="fw-bold" style="width:20%;background:var(--bg-light);">الصورة</td>
+                        {% for p in products %}
+                        <td class="text-center" style="width:40%;">
+                            <div style="padding:20px;">
+                                {% if p.primary_image %}
+                                <img src="{{ url_for('static', filename=p.primary_image.image_path) }}" alt="{{ p.name_ar }}" style="max-height:200px;max-width:100%;object-fit:contain;">
+                                {% else %}
+                                <img src="https://placehold.co/300x200/e2e8f0/94a3b8?text={{ p.brand.name }}" style="max-height:200px;">
+                                {% endif %}
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    <!-- Name -->
+                    <tr>
+                        <td class="fw-bold" style="background:var(--bg-light);">المنتج</td>
+                        {% for p in products %}
+                        <td>
+                            <strong>{{ p.name_ar }}</strong><br>
+                            <small class="text-muted">{{ p.sku }}</small>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    <!-- Brand -->
+                    <tr>
+                        <td class="fw-bold" style="background:var(--bg-light);">العلامة التجارية</td>
+                        {% for p in products %}
+                        <td>{{ p.brand.name }}</td>
+                        {% endfor %}
+                    </tr>
+                    <!-- Category -->
+                    <tr>
+                        <td class="fw-bold" style="background:var(--bg-light);">التصنيف</td>
+                        {% for p in products %}
+                        <td>{{ p.category.name_ar }}</td>
+                        {% endfor %}
+                    </tr>
+                    <!-- Specs - merge all keys -->
+                    {% set all_keys = [] %}
+                    {% for p in products %}
+                        {% if p.specs_json %}
+                            {% for k in p.specs_json.keys() %}
+                                {% if k not in all_keys %}
+                                    {% if all_keys.append(k) %}{% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                    {% for key in all_keys %}
+                    <tr>
+                        <td class="fw-bold" style="background:var(--bg-light);">{{ key }}</td>
+                        {% for p in products %}
+                        <td>{{ p.specs_json.get(key, '-') if p.specs_json else '-' }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    <!-- RFQ Buttons -->
+                    <tr>
+                        <td class="fw-bold" style="background:var(--bg-light);">طلب سعر</td>
+                        {% for p in products %}
+                        <td class="text-center">
+                            <a href="{{ url_for('rfq_bp.request_quote', product_id=p.id) }}" class="btn btn-primary">
+                                <i class="bi bi-chat-dots-fill ms-1"></i> اطلب عرض سعر
+                            </a>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    <!-- Remove -->
+                    <tr>
+                        <td style="background:var(--bg-light);"></td>
+                        {% for p in products %}
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeFromCompareAndReload('{{ p.id }}')">
+                                <i class="bi bi-x-lg ms-1"></i> إزالة
+                            </button>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        {% elif products|length == 1 %}
+        <div class="empty-state">
+            <i class="bi bi-arrow-left-right"></i>
+            <h4>اختر منتجاً آخر للمقارنة</h4>
+            <p>لديك منتج واحد فقط: <strong>{{ products[0].name_ar }}</strong></p>
+            <a href="{{ url_for('catalog_bp.product_list') }}" class="btn btn-primary mt-3">تصفح المنتجات</a>
+        </div>
+
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-arrow-left-right"></i>
+            <h4>لا توجد منتجات للمقارنة</h4>
+            <p>اختر منتجين من الكتالوج لمقارنتهما</p>
+            <a href="{{ url_for('catalog_bp.product_list') }}" class="btn btn-primary mt-3">تصفح المنتجات</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function removeFromCompareAndReload(id) {
+    var list = getCompareList().filter(function(item) { return String(item.id) !== String(id); });
+    saveCompareList(list);
+    if (list.length > 0) {
+        window.location.href = '{{ url_for("catalog_bp.compare_products") }}?ids=' + list.map(function(i){return i.id;}).join(',');
+    } else {
+        window.location.href = '{{ url_for("catalog_bp.product_list") }}';
+    }
+}
+</script>
+{% endblock %}

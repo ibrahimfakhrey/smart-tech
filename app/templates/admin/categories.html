@@ -1,0 +1,64 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}التصنيفات{% endblock %}
+
+{% block admin_content %}
+<div class="top-bar">
+    <h3>التصنيفات</h3>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCatModal"><i class="bi bi-plus-lg ms-1"></i> إضافة تصنيف</button>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead style="background:#f8fafc;"><tr><th>التصنيف</th><th>الأيقونة</th><th>المنتجات</th><th>الفئات الفرعية</th><th>إجراءات</th></tr></thead>
+                <tbody>
+                    {% for cat in categories %}
+                    <tr>
+                        <td><strong>{{ cat.name_ar }}</strong> <small class="text-muted">({{ cat.name_en or cat.slug }})</small></td>
+                        <td><i class="{{ cat.icon or 'bi-collection' }}"></i></td>
+                        <td>{{ cat.product_count }}</td>
+                        <td>
+                            {% for sub in cat.subcategories %}
+                            <span class="badge bg-light text-dark me-1">{{ sub.name_ar }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin_bp.category_delete', cat_id=cat.id) }}" style="display:inline;" onsubmit="return confirm('حذف التصنيف؟')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCatModal" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+        <form method="POST" action="{{ url_for('admin_bp.category_add') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="modal-header"><h5 class="modal-title">إضافة تصنيف</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="mb-3"><label class="form-label">الاسم بالعربية *</label><input type="text" name="name_ar" class="form-control" required></div>
+                <div class="mb-3"><label class="form-label">الاسم بالإنجليزية</label><input type="text" name="name_en" class="form-control"></div>
+                <div class="mb-3"><label class="form-label">أيقونة Bootstrap Icons</label><input type="text" name="icon" class="form-control" dir="ltr" placeholder="bi-display"></div>
+                <div class="mb-3">
+                    <label class="form-label">تصنيف أب (اتركه فارغاً للتصنيف الرئيسي)</label>
+                    <select name="parent_id" class="form-select">
+                        <option value="">تصنيف رئيسي</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}">{{ cat.name_ar }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer"><button type="submit" class="btn btn-primary">إضافة</button></div>
+        </form>
+    </div></div>
+</div>
+{% endblock %}

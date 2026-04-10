@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}المفضلة | سما تكنولوجي{% endblock %}
+
+{% block content %}
+<section class="breadcrumb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main_bp.home') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item active">المفضلة</li>
+            </ol>
+        </nav>
+        <h1 style="font-size:1.8rem;margin-top:8px;">المفضلة</h1>
+    </div>
+</section>
+
+<section class="section" style="padding-top:20px;">
+    <div class="container">
+        <!-- Loading -->
+        <div id="wishlistLoading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 text-muted">جاري تحميل المفضلة...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="wishlistEmpty" style="display:none;">
+            <div class="empty-state">
+                <i class="bi bi-heart"></i>
+                <h4>المفضلة فارغة</h4>
+                <p>لم تقم بإضافة أي منتجات للمفضلة بعد</p>
+                <a href="{{ url_for('catalog_bp.product_list') }}" class="btn btn-primary mt-3">تصفح المنتجات</a>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div id="wishlistGrid" style="display:none;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <p class="mb-0 text-muted"><span id="wishlistTotal">0</span> منتج في المفضلة</p>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" id="bulkRfqBtn" onclick="openBulkRfq()">
+                        <i class="bi bi-chat-dots-fill ms-1"></i> اطلب عرض سعر للجميع
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="clearWishlistAll()">
+                        <i class="bi bi-trash ms-1"></i> مسح الكل
+                    </button>
+                </div>
+            </div>
+
+            <div class="row g-3" id="wishlistProducts"></div>
+        </div>
+
+        <!-- Bulk RFQ Form (hidden) -->
+        <form id="bulkRfqForm" method="POST" action="{{ url_for('rfq_bp.request_bulk_quote') }}" style="display:none;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div id="bulkProductInputs"></div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadWishlistProducts();
+});
+
+function loadWishlistProducts() {
+    var wishlist = getWishlist();
+    var loading = document.getElementById('wishlistLoading');
+    var empty = document.getElementById('wishlistEmpty');
+    var grid = document.getElementById('wishlistGrid');
+    var productsDiv = document.getElementById('wishlistProducts');
+    var totalSpan = document.getElementById('wishlistTotal');
+
+    if (wishlist.length === 0) {
+        loading.style.display = 'none';
+        empty.style.display = 'block';
+        return;
+    }
+
+    var ids = wishlist.map(function(item) { return item.id; }).join(',');
+
+    fetch('/ar/products/api/products-by-ids?ids=' + ids)
+        .then(function(r) { return r.json(); })
+        .then(function(products) {
+            loading.style.display = 'none';
+
+            if (products.length === 0) {
+                empty.style.display = 'block';
+                return;
+            }
+
+            grid.style.display = 'block';
+            totalSpan.textContent = products.length;
+
+            productsDiv.innerHTML = products.map(function(p) {
+                var img = p.image
+                    ? '/static/' + p.image
+                    : 'https://placehold.co/400x300/e2e8f0/94a3b8?text=' + encodeURIComponent(p.brand);
+                var detailUrl = '/ar/products/' + p.category_slug + '/' + p.slug + '/';
+
+                return '<div class="col-6 col-md-4 col-lg-3">' +
+                    '<div class="product-card">' +
+                    '<div class="product-card-img">' +
+                    '<img src="' + img + '" alt="' + p.name + '" loading="lazy">' +
+                    '<div class="product-card-actions" style="opacity:1;">' +
+                    '<button class="action-btn active" onclick="removeWishlistItem(' + p.id + ')" title="إزالة">' +
+                    '<i class="bi bi-heart-fill"></i></button>' +
+                    '</div></div>' +
+                    '<div class="product-card-body">' +
+                    '<span class="product-card-brand">' + p.brand + '</span>' +
+                    '<h5 class="product-card-title">' + p.name + '</h5>' +
+                    '<span class="product-card-sku">' + p.sku + '</span>' +
+                    '<div class="product-card-footer">' +
+                    '<span class="product-card-category">' + p.category + '</span>' +
+                    '<a href="' + detailUrl + '" class="product-card-link">اعرف أكثر <i class="bi bi-arrow-left"></i></a>' +
+                    '</div></div></div></div>';
+            }).join('');
+        })
+        .catch(function() {
+            loading.style.display = 'none';
+            empty.style.display = 'block';
+        });
+}
+
+function removeWishlistItem(id) {
+    var wishlist = getWishlist().filter(function(item) { return String(item.id) !== String(id); });
+    saveWishlist(wishlist);
+    showToast('تم إزالة المنتج من المفضلة', 'info');
+    setTimeout(function() { window.location.reload(); }, 500);
+}
+
+function clearWishlistAll() {
+    if (confirm('هل تريد مسح جميع المنتجات من المفضلة؟')) {
+        saveWishlist([]);
+        loadWishlistProducts();
+        showToast('تم مسح المفضلة', 'info');
+    }
+}
+
+function openBulkRfq() {
+    var wishlist = getWishlist();
+    if (wishlist.length === 0) return;
+
+    var inputs = document.getElementById('bulkProductInputs');
+    inputs.innerHTML = wishlist.map(function(item) {
+        return '<input type="hidden" name="product_ids" value="' + item.id + '">';
+    }).join('');
+
+    // Redirect to bulk RFQ form page
+    window.location.href = '/rfq/request/' + wishlist[0].id + '?bulk=1';
+}
+</script>
+{% endblock %}

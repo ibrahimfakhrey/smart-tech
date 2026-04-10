@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}من نحن | سما تكنولوجي{% endblock %}
+{% block meta_description %}تعرف على شركة سما تكنولوجي - أكثر من 10 سنوات خبرة في حلول الاتصالات والبنية التحتية الذكية{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1>من نحن</h1>
+        <p>سما تكنولوجي - Plug Into The Future</p>
+    </div>
+</section>
+
+<!-- About Content -->
+<section class="section bg-white-section">
+    <div class="container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6">
+                <div class="section-accent"></div>
+                <h2 class="mb-3">{{ company_info.get('company_name_ar', 'سما تكنولوجي') }}</h2>
+                <p class="lead" style="color:var(--text-body);line-height:2;">
+                    {{ company_info.get('about_ar', 'سما تك هي شركة متخصصة في حلول الاتصالات وأنظمة التيار الخفيف والبنية التحتية التقنية.') }}
+                </p>
+            </div>
+            <div class="col-lg-6">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="stat-item text-center p-4" style="background:var(--bg-light);border-radius:var(--radius-lg);">
+                            <span class="stat-number" style="-webkit-text-fill-color:var(--primary);font-size:2rem;">{{ company_info.get('years_experience', '10+') }}</span>
+                            <span class="stat-label" style="color:var(--text-muted);">سنوات الخبرة</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-item text-center p-4" style="background:var(--bg-light);border-radius:var(--radius-lg);">
+                            <span class="stat-number" style="-webkit-text-fill-color:var(--primary);font-size:2rem;">{{ company_info.get('clients_count', '500+') }}</span>
+                            <span class="stat-label" style="color:var(--text-muted);">عميل</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Vision & Mission -->
+<section class="section bg-light-section">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="service-card text-start h-100">
+                    <div class="service-icon mb-3" style="margin:0;"><i class="bi bi-eye"></i></div>
+                    <h3 style="font-size:1.3rem;">رؤيتنا</h3>
+                    <p style="color:var(--text-body);line-height:1.9;">
+                        {{ company_info.get('vision_ar', 'أن نكون شريكاً تقنياً موثوقاً في حلول الاتصالات والبنية التحتية الذكية في الشرق الأوسط.') }}
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="service-card text-start h-100">
+                    <div class="service-icon mb-3" style="margin:0;"><i class="bi bi-bullseye"></i></div>
+                    <h3 style="font-size:1.3rem;">رسالتنا</h3>
+                    <p style="color:var(--text-body);line-height:1.9;">
+                        {{ company_info.get('mission_ar', 'تقديم حلول تقنية عملية وفعّالة تساعد عملاءنا على تحسين الأداء.') }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Core Values -->
+<section class="section bg-white-section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-accent"></div>
+            <h2>قيمنا</h2>
+        </div>
+        <div class="row g-4 justify-content-center">
+            {% set values = company_info.get('values_ar', 'الاحترافية|الشفافية|الجودة|الابتكار|بناء علاقات').split('|') %}
+            {% for value in values %}
+            <div class="col-md-6 col-lg-4">
+                <div class="why-card">
+                    <div class="why-card-icon"><i class="bi bi-check-circle-fill"></i></div>
+                    <div><h5>{{ value }}</h5></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Services Detail -->
+<section class="section bg-light-section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-accent"></div>
+            <h2>خدماتنا الأساسية</h2>
+        </div>
+        <div class="row g-4">
+            {% set services = [
+                ('bi-telephone-forward', company_info.get('services_1', 'حلول VoIP ومراكز الاتصال'), company_info.get('services_1_desc', '')),
+                ('bi-diagram-3', company_info.get('services_2', 'البنية التحتية للشبكات'), company_info.get('services_2_desc', '')),
+                ('bi-camera-video', company_info.get('services_3', 'أنظمة التيار الخفيف'), company_info.get('services_3_desc', '')),
+                ('bi-wrench-adjustable', company_info.get('services_4', 'الدعم الفني وعقود الصيانة'), company_info.get('services_4_desc', ''))
+            ] %}
+            {% for icon, title, desc in services %}
+            <div class="col-md-6">
+                <div class="service-card text-start h-100">
+                    <div class="service-icon mb-3" style="margin:0;"><i class="{{ icon }}"></i></div>
+                    <h4>{{ title }}</h4>
+                    <p style="color:var(--text-body);line-height:1.9;">{{ desc }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Sectors -->
+<section class="section bg-white-section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-accent"></div>
+            <h2>القطاعات التي نخدمها</h2>
+        </div>
+        <div class="row g-4 justify-content-center">
+            {% set sectors_icons = ['bi-building', 'bi-mortarboard', 'bi-hospital', 'bi-house-door', 'bi-headset'] %}
+            {% set sectors = company_info.get('sectors_ar', 'الشركات والمؤسسات|المدارس والجامعات|المستشفيات والمراكز الطبية|الفنادق|مراكز الاتصال').split('|') %}
+            {% for sector in sectors %}
+            <div class="col-6 col-md-4 col-lg">
+                <div class="category-card">
+                    <i class="{{ sectors_icons[loop.index0] if loop.index0 < sectors_icons|length else 'bi-building' }} cat-icon"></i>
+                    <h5>{{ sector }}</h5>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="section cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>مستعد للبدء؟</h2>
+            <p>تواصل معنا اليوم واحصل على استشارة مجانية لمشروعك</p>
+            <a href="{{ url_for('main_bp.contact') }}" class="btn btn-light btn-lg" style="color:var(--primary);font-weight:700;">
+                <i class="bi bi-chat-dots-fill ms-2"></i> تواصل معنا
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

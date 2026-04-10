@@ -1,0 +1,360 @@
+{% extends "base.html" %}
+
+{% block title %}سما تكنولوجي | Sama Technology - Plug Into The Future{% endblock %}
+
+{% block content %}
+<!-- ═══ HERO SECTION (LP-01) ═══ -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="bi bi-lightning-charge-fill"></i>
+                        {{ company_info.get('company_name_en', 'Sama Technology') }}
+                    </div>
+                    <h1 class="hero-title">
+                        {{ company_info.get('hero_headline', 'شريكك التقني الموثوق') }}
+                    </h1>
+                    <p class="hero-subtitle">
+                        توريد وتركيب الشاشات التفاعلية، أجهزة مؤتمرات الفيديو، هواتف IP، السماعات، والاكسسوارات التقنية للشركات والجهات الحكومية في السعودية والخليج
+                    </p>
+                    <div class="hero-btns">
+                        <a href="{{ url_for('catalog_bp.product_list') }}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-grid-3x3-gap-fill ms-2"></i>
+                            {{ company_info.get('hero_cta', 'تصفح المنتجات') }}
+                        </a>
+                        <a href="{{ url_for('main_bp.contact') }}" class="btn btn-outline-light btn-lg">
+                            اطلب عرض سعر
+                        </a>
+                    </div>
+
+                    <div class="hero-stats">
+                        <div class="hero-stat-item">
+                            <span class="hero-stat-number" data-count="{{ company_info.get('years_experience', '10+') }}">{{ company_info.get('years_experience', '10+') }}</span>
+                            <span class="hero-stat-label">سنوات الخبرة</span>
+                        </div>
+                        <div class="hero-stat-item">
+                            <span class="hero-stat-number" data-count="{{ company_info.get('clients_count', '500+') }}">{{ company_info.get('clients_count', '500+') }}</span>
+                            <span class="hero-stat-label">عميل</span>
+                        </div>
+                        <div class="hero-stat-item">
+                            <span class="hero-stat-number" data-count="{{ company_info.get('products_count', '200+') }}">{{ company_info.get('products_count', '200+') }}</span>
+                            <span class="hero-stat-label">منتج</span>
+                        </div>
+                        <div class="hero-stat-item">
+                            <span class="hero-stat-number">{{ company_info.get('coverage', 'السعودية والخليج') }}</span>
+                            <span class="hero-stat-label">التغطية</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ SERVICES SECTION (LP-02) ═══ -->
+<section class="section bg-white-section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-accent"></div>
+            <h2>خدماتنا</h2>
+            <p>نقدم حلولاً تقنية متكاملة تغطي جميع احتياجات مؤسستك</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="service-card">
+                    <div class="service-icon"><i class="bi bi-box-seam"></i></div>
+                    <h4>التوريد</h4>
+                    <p>{{ company_info.get('services_1_desc', 'توريد أحدث المنتجات التقنية من أفضل العلامات التجارية العالمية')[:80] }}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="service-card">
+                    <div class="service-icon"><i class="bi bi-tools"></i></div>
+                    <h4>التركيب</h4>
+                    <p>{{ company_info.get('services_2_desc', 'تصميم وتنفيذ البنية التحتية للشبكات والأنظمة التقنية')[:80] }}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="service-card">
+                    <div class="service-icon"><i class="bi bi-shield-check"></i></div>
+                    <h4>الضمان</h4>
+                    <p>{{ company_info.get('services_3_desc', 'ضمان شامل على جميع المنتجات والأنظمة المقدمة')[:80] }}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="service-card">
+                    <div class="service-icon"><i class="bi bi-headset"></i></div>
+                    <h4>الدعم الفني</h4>
+                    <p>{{ company_info.get('services_4_desc', 'دعم فني متواصل 24/7 وعقود صيانة سنوية')[:80] }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ CATEGORIES SECTION (LP-04) ═══ -->
+<section class="section bg-light-section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-accent"></div>
+            <h2>تصنيفات المنتجات</h2>
+            <p>تصفح مجموعتنا المتنوعة من الحلول التقنية</p>
+        </div>
+
+        <div class="row g-4">
+            {% for cat in categories %}
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{{ url_for('catalog_bp.category_products', category_slug=cat.slug) }}" class="category-card">
+                    <i class="{{ cat.icon or 'bi-collection' }} cat-icon"></i>
+                    <h5>{{ cat.name_ar }}</h5>
+                    <span class="cat-count">{{ cat.product_count }} منتج</span>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ═══ FEATURED PRODUCTS (LP-03) ═══ -->
+<section class="section bg-white-section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-accent"></div>
+            <h2>منتجات مميزة</h2>
+            <p>اكتشف أبرز المنتجات المختارة من فريقنا</p>
+        </div>
+
+        <div class="row g-4">
+            {% for product in featured_products[:8] %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="product-card">
+                    <div class="product-card-img">
+                        {% if product.primary_image %}
+                        <img src="{{ url_for('static', filename=product.primary_image.image_path) }}" alt="{{ product.name_ar }}">
+                        {% else %}
+                        <img src="https://placehold.co/400x300/e2e8f0/94a3b8?text={{ product.brand.name }}" alt="{{ product.name_ar }}">
+                        {% endif %}
+
+                        <div class="product-card-actions">
+                            <button class="action-btn wishlist-btn" data-product-id="{{ product.id }}" data-product-name="{{ product.name_ar }}" onclick="toggleWishlist(this)" title="أضف للمفضلة">
+                                <i class="bi bi-heart"></i>
+                            </button>
+                            <button class="action-btn compare-btn" data-product-id="{{ product.id }}" data-product-name="{{ product.name_ar }}" onclick="toggleCompare(this)" title="قارن">
+                                <i class="bi bi-arrow-left-right"></i>
+                            </button>
+                        </div>
+
+                        {% if product.is_featured %}
+                        <span class="product-card-badge">مميز</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-card-body">
+                        <span class="product-card-brand">{{ product.brand.name }}</span>
+                        <h5 class="product-card-title">{{ product.name_ar }}</h5>
+                        <span class="product-card-sku">{{ product.sku }}</span>
+
+                        <div class="product-card-footer">
+                            <span class="product-card-category">{{ product.category.name_ar }}</span>
+                            <a href="{{ url_for('catalog_bp.product_detail', category_slug=product.category.parent.slug if product.category.parent else product.category.slug, product_slug=product.slug) }}" class="product-card-link">
+                                اعرف أكثر <i class="bi bi-arrow-left"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="{{ url_for('catalog_bp.product_list') }}" class="btn btn-outline-primary btn-lg">
+                عرض جميع المنتجات <i class="bi bi-arrow-left ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ BRANDS SECTION (LP-05) ═══ -->
+<section class="section brands-section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-accent"></div>
+            <h2>شركاؤنا</h2>
+            <p>نتعاون مع أفضل العلامات التجارية العالمية في مجال التقنية</p>
+        </div>
+
+        <div class="row g-3 justify-content-center align-items-center">
+            {% for brand in brands %}
+            <div class="col-4 col-md-3 col-lg-2">
+                <div class="brand-logo">
+                    {% if brand.logo_path %}
+                    <img src="{{ url_for('static', filename=brand.logo_path) }}" alt="{{ brand.name }}">
+                    {% else %}
+                    <span class="brand-logo-text">{{ brand.name }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ═══ STATS SECTION (LP-06) ═══ -->
+<section class="section stats-section">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <span class="stat-number">{{ company_info.get('years_experience', '10+') }}</span>
+                    <span class="stat-label">سنوات الخبرة</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <span class="stat-number">{{ company_info.get('clients_count', '500+') }}</span>
+                    <span class="stat-label">عميل راضٍ</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <span class="stat-number">{{ company_info.get('products_count', '200+') }}</span>
+                    <span class="stat-label">منتج متوفر</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <span class="stat-number">{{ brands|length }}+</span>
+                    <span class="stat-label">علامة تجارية</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ WHY SAMA TECH ═══ -->
+<section class="section bg-light-section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-accent"></div>
+            <h2>لماذا سما تك؟</h2>
+            <p>نلتزم بتقديم أعلى معايير الجودة والاحترافية</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="why-card">
+                    <div class="why-card-icon"><i class="bi bi-award"></i></div>
+                    <div>
+                        <h5>خبرة حقيقية تمتد لأكثر من 10 سنوات</h5>
+                        <p>خبرة عملية في السوق المصري والسعودي والخليجي</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="why-card">
+                    <div class="why-card-icon"><i class="bi bi-people"></i></div>
+                    <div>
+                        <h5>فريق هندسي مؤهل</h5>
+                        <p>فريق متخصص في حلول الاتصالات والبنية التحتية</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="why-card">
+                    <div class="why-card-icon"><i class="bi bi-gear"></i></div>
+                    <div>
+                        <h5>حلول مصممة حسب احتياج العميل</h5>
+                        <p>نقدم حلولاً مخصصة تناسب طبيعة كل مؤسسة</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="why-card">
+                    <div class="why-card-icon"><i class="bi bi-currency-dollar"></i></div>
+                    <div>
+                        <h5>مرونة في التنفيذ والتسعير</h5>
+                        <p>أسعار تنافسية مع خيارات تنفيذ مرنة</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="why-card">
+                    <div class="why-card-icon"><i class="bi bi-patch-check"></i></div>
+                    <div>
+                        <h5>التزام كامل بمعايير الجودة</h5>
+                        <p>نستخدم منتجات وحلول معتمدة لضمان أعلى مستويات الأداء</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="why-card">
+                    <div class="why-card-icon"><i class="bi bi-headset"></i></div>
+                    <div>
+                        <h5>دعم فني مستمر 24/7</h5>
+                        <p>عقود صيانة سنوية واستجابة سريعة للأعطال</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ CTA + NEWSLETTER (LP-07, LP-08) ═══ -->
+<section class="section cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>هل تبحث عن حلول تقنية لمؤسستك؟</h2>
+            <p>تواصل معنا الآن واحصل على عرض سعر مخصص لاحتياجاتك</p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap mb-5">
+                <a href="{{ url_for('main_bp.contact') }}" class="btn btn-light btn-lg" style="color:var(--primary);font-weight:700;">
+                    <i class="bi bi-chat-dots-fill ms-2"></i> اطلب عرض سعر
+                </a>
+                <a href="tel:{{ config.COMPANY_PHONE_1 }}" class="btn btn-outline-light btn-lg">
+                    <i class="bi bi-telephone-fill ms-2"></i> {{ config.COMPANY_PHONE_1 }}
+                </a>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="newsletter-form">
+                <p style="color:rgba(255,255,255,0.7);font-size:0.9rem;margin-bottom:12px;">اشترك في نشرتنا البريدية لمتابعة أحدث المنتجات</p>
+                <form id="newsletterForm" onsubmit="return submitNewsletter(event)">
+                    <div class="input-group">
+                        <input type="email" class="form-control" name="email" placeholder="البريد الإلكتروني" required>
+                        <button class="btn" type="submit">اشتراك</button>
+                    </div>
+                </form>
+                <div id="newsletterMsg" class="mt-2" style="font-size:0.85rem;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function submitNewsletter(e) {
+    e.preventDefault();
+    const form = document.getElementById('newsletterForm');
+    const msg = document.getElementById('newsletterMsg');
+    const email = form.querySelector('input[name="email"]').value;
+
+    fetch('{{ url_for("main_bp.newsletter_subscribe") }}', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'email=' + encodeURIComponent(email)
+    })
+    .then(r => r.json())
+    .then(data => {
+        msg.innerHTML = '<span style="color:#86efac;">' + data.message + '</span>';
+        if (data.success) form.reset();
+    })
+    .catch(() => {
+        msg.innerHTML = '<span style="color:#fca5a5;">حدث خطأ، حاول مرة أخرى</span>';
+    });
+    return false;
+}
+</script>
+{% endblock %}
