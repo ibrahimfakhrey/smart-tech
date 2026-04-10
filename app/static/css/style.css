@@ -919,10 +919,9 @@ img {
     to { transform: translateY(0); }
 }
 
-/* Push sticky CTA up when compare bar is visible */
-.compare-bar.active ~ .sticky-cta,
+/* Hide sticky CTA when compare bar is visible */
 body.compare-active .sticky-cta {
-    bottom: 80px;
+    display: none !important;
 }
 
 .compare-item {
