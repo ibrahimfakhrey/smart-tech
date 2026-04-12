@@ -344,6 +344,19 @@ def brand_edit(brand_id):
     return redirect(url_for('admin_bp.brands_list'))
 
 
+@admin_bp.route('/brands/delete/<int:brand_id>', methods=['POST'])
+@login_required
+def brand_delete(brand_id):
+    brand = Brand.query.get_or_404(brand_id)
+    if brand.product_count > 0:
+        flash('لا يمكن حذف علامة تجارية تحتوي على منتجات', 'error')
+    else:
+        db.session.delete(brand)
+        db.session.commit()
+        flash('تم حذف العلامة التجارية', 'success')
+    return redirect(url_for('admin_bp.brands_list'))
+
+
 # ─── Orders (RFQ) ───
 @admin_bp.route('/orders')
 @login_required

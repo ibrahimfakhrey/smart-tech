@@ -13,14 +13,45 @@
         <div class="card h-100">
             <div class="card-body text-center">
                 {% if brand.logo_path %}
-                <img src="{{ url_for('static', filename=brand.logo_path) }}" style="max-height:50px;margin-bottom:12px;">
+                <img src="{{ url_for('static', filename=brand.logo_path) }}" style="max-height:50px;margin-bottom:12px;"><br>
+                <small class="text-muted">{{ brand.name }}</small>
                 {% else %}
                 <h5 class="mb-2">{{ brand.name }}</h5>
                 {% endif %}
                 <p class="text-muted mb-2" style="font-size:.8rem;">{{ brand.product_count }} منتج</p>
                 <p class="text-muted" style="font-size:.8rem;">{{ (brand.description_ar or '')[:60] }}</p>
             </div>
+            <div class="card-footer d-flex gap-2 justify-content-center">
+                <button class="btn btn-sm btn-outline-primary"
+                    data-bs-toggle="modal" data-bs-target="#editBrandModal{{ brand.id }}">
+                    <i class="bi bi-pencil"></i> تعديل
+                </button>
+                <form method="POST" action="{{ url_for('admin_bp.brand_delete', brand_id=brand.id) }}"
+                    onsubmit="return confirm('هل أنت متأكد من حذف هذه العلامة؟')">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-trash"></i> حذف
+                    </button>
+                </form>
+            </div>
         </div>
+    </div>
+
+    <!-- Edit Brand Modal -->
+    <div class="modal fade" id="editBrandModal{{ brand.id }}" tabindex="-1">
+        <div class="modal-dialog"><div class="modal-content">
+            <form method="POST" action="{{ url_for('admin_bp.brand_edit', brand_id=brand.id) }}" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-header"><h5 class="modal-title">تعديل: {{ brand.name }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div class="mb-3"><label class="form-label">الاسم *</label><input type="text" name="name" class="form-control" value="{{ brand.name }}" required></div>
+                    <div class="mb-3"><label class="form-label">الوصف</label><textarea name="description_ar" class="form-control" rows="3">{{ brand.description_ar or '' }}</textarea></div>
+                    <div class="mb-3"><label class="form-label">رابط الموقع</label><input type="url" name="website_url" class="form-control" dir="ltr" value="{{ brand.website_url or '' }}"></div>
+                    <div class="mb-3"><label class="form-label">الشعار (اتركه فارغاً للإبقاء على الحالي)</label><input type="file" name="logo" class="form-control" accept="image/*"></div>
+                </div>
+                <div class="modal-footer"><button type="submit" class="btn btn-primary">حفظ التغييرات</button></div>
+            </form>
+        </div></div>
     </div>
     {% endfor %}
 </div>

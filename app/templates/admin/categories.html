@@ -23,13 +23,32 @@
                             <span class="badge bg-light text-dark me-1">{{ sub.name_ar }}</span>
                             {% endfor %}
                         </td>
-                        <td>
+                        <td class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editCatModal{{ cat.id }}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
                             <form method="POST" action="{{ url_for('admin_bp.category_delete', cat_id=cat.id) }}" style="display:inline;" onsubmit="return confirm('حذف التصنيف؟')">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
                             </form>
                         </td>
                     </tr>
+
+                    <!-- Edit Category Modal -->
+                    <div class="modal fade" id="editCatModal{{ cat.id }}" tabindex="-1">
+                        <div class="modal-dialog"><div class="modal-content">
+                            <form method="POST" action="{{ url_for('admin_bp.category_edit', cat_id=cat.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="modal-header"><h5 class="modal-title">تعديل: {{ cat.name_ar }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                                <div class="modal-body">
+                                    <div class="mb-3"><label class="form-label">الاسم بالعربية *</label><input type="text" name="name_ar" class="form-control" value="{{ cat.name_ar }}" required></div>
+                                    <div class="mb-3"><label class="form-label">الاسم بالإنجليزية</label><input type="text" name="name_en" class="form-control" value="{{ cat.name_en or '' }}"></div>
+                                    <div class="mb-3"><label class="form-label">أيقونة Bootstrap Icons</label><input type="text" name="icon" class="form-control" dir="ltr" value="{{ cat.icon or '' }}" placeholder="bi-display"></div>
+                                </div>
+                                <div class="modal-footer"><button type="submit" class="btn btn-primary">حفظ التغييرات</button></div>
+                            </form>
+                        </div></div>
+                    </div>
                     {% endfor %}
                 </tbody>
             </table>
