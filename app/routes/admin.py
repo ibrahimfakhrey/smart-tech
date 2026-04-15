@@ -447,6 +447,54 @@ def orders_export():
                      mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 
+# ─── Admins Management ───
+@admin_bp.route('/admins')
+@login_required
+def admins_list():
+    admins = Admin.query.order_by(Admin.created_at.desc()).all()
+    return render_template('admin/admins.html', admins=admins)
+
+
+@admin_bp.route('/admins/add', methods=['POST'])
+@login_required
+def admin_add():
+    username = request.form.get('username', '').strip()
+    email = request.form.get('email', '').strip()
+    password = request.form.get('password', '').strip()
+
+    if not username or not email or not password:
+        flash('جميع الحقول مطلوبة', 'error')
+        return redirect(url_for('admin_bp.admins_list'))
+
+    if Admin.query.filter_by(username=username).first():
+        flash('اسم المستخدم مستخدم بالفعل', 'error')
+        return redirect(url_for('admin_bp.admins_list'))
+
+    if Admin.query.filter_by(email=email).first():
+        flash('البريد الإلكتروني مستخدم بالفعل', 'error')
+        return redirect(url_for('admin_bp.admins_list'))
+
+    admin = Admin(username=username, email=email)
+    admin.set_password(password)
+    db.session.add(admin)
+    db.session.commit()
+    flash(f'تم إضافة المشرف "{username}" بنجاح', 'success')
+    return redirect(url_for('admin_bp.admins_list'))
+
+
+@admin_bp.route('/admins/delete/<int:admin_id>', methods=['POST'])
+@login_required
+def admin_delete(admin_id):
+    if admin_id == current_user.id:
+        flash('لا يمكنك حذف حسابك الخاص', 'error')
+        return redirect(url_for('admin_bp.admins_list'))
+    admin = Admin.query.get_or_404(admin_id)
+    db.session.delete(admin)
+    db.session.commit()
+    flash(f'تم حذف المشرف "{admin.username}"', 'success')
+    return redirect(url_for('admin_bp.admins_list'))
+
+
 # ─── Homepage Settings ───
 @admin_bp.route('/homepage', methods=['GET', 'POST'])
 @login_required

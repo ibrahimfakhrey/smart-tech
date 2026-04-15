@@ -1,0 +1,112 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}إدارة المشرفين{% endblock %}
+
+{% block admin_content %}
+<div class="top-bar">
+    <h3>إدارة المشرفين</h3>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAdminModal">
+        <i class="bi bi-plus-lg ms-1"></i> إضافة مشرف
+    </button>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>اسم المستخدم</th>
+                    <th>البريد الإلكتروني</th>
+                    <th>تاريخ الإضافة</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for admin in admins %}
+                <tr>
+                    <td class="text-muted">{{ admin.id }}</td>
+                    <td>
+                        <strong>{{ admin.username }}</strong>
+                        {% if admin.id == current_user.id %}
+                        <span class="badge bg-primary ms-1">أنت</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted" dir="ltr">{{ admin.email }}</td>
+                    <td class="text-muted">{{ admin.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td class="text-end">
+                        {% if admin.id != current_user.id %}
+                        <form method="POST" action="{{ url_for('admin_bp.admin_delete', admin_id=admin.id) }}"
+                              onsubmit="return confirm('هل أنت متأكد من حذف المشرف {{ admin.username }}؟')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i> حذف
+                            </button>
+                        </form>
+                        {% else %}
+                        <span class="text-muted small">لا يمكن حذف حسابك</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center text-muted py-4">لا يوجد مشرفون</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Admin Modal -->
+<div class="modal fade" id="addAdminModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('admin_bp.admin_add') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">إضافة مشرف جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">اسم المستخدم *</label>
+                        <input type="text" name="username" class="form-control" dir="ltr" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">البريد الإلكتروني *</label>
+                        <input type="email" name="email" class="form-control" dir="ltr" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">كلمة المرور *</label>
+                        <div class="input-group">
+                            <input type="password" name="password" id="newAdminPassword" class="form-control" dir="ltr" required minlength="6">
+                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">
+                                <i class="bi bi-eye" id="eyeIcon"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">6 أحرف على الأقل</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">إضافة المشرف</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+function togglePassword() {
+    const input = document.getElementById('newAdminPassword');
+    const icon = document.getElementById('eyeIcon');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'bi bi-eye';
+    }
+}
+</script>
+{% endblock %}
+{% endblock %}

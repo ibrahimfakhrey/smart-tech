@@ -59,6 +59,7 @@
             <li><a href="{{ url_for('admin_bp.shipping_settings') }}" class="{% if 'shipping' in request.endpoint %}active{% endif %}"><i class="bi bi-truck"></i> الشحن والتوصيل</a></li>
 
             <li class="nav-section">الحساب</li>
+            <li><a href="{{ url_for('admin_bp.admins_list') }}" class="{% if 'admin' in request.endpoint and 'admins' in request.endpoint %}active{% endif %}"><i class="bi bi-people"></i> إدارة المشرفين</a></li>
             <li><a href="{{ url_for('main_bp.home') }}" target="_blank"><i class="bi bi-globe2"></i> زيارة الموقع</a></li>
             <li><a href="{{ url_for('admin_bp.logout') }}"><i class="bi bi-box-arrow-right"></i> تسجيل الخروج</a></li>
         </ul>
