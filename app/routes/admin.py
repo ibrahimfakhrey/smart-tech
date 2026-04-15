@@ -281,7 +281,9 @@ def category_edit(cat_id):
 @login_required
 def category_delete(cat_id):
     cat = Category.query.get_or_404(cat_id)
-    if cat.product_count > 0:
+    if cat.subcategories.count() > 0:
+        flash('لا يمكن حذف تصنيف يحتوي على فئات فرعية، احذف الفئات الفرعية أولاً', 'error')
+    elif cat.product_count > 0:
         flash('لا يمكن حذف تصنيف يحتوي على منتجات', 'error')
     else:
         db.session.delete(cat)
