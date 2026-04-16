@@ -27,7 +27,8 @@
                             <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editCatModal{{ cat.id }}">
                                 <i class="bi bi-pencil"></i>
                             </button>
-                            <form method="POST" action="{{ url_for('admin_bp.category_delete', cat_id=cat.id) }}" style="display:inline;" onsubmit="return confirm('حذف التصنيف؟')">
+                            <form method="POST" action="{{ url_for('admin_bp.category_delete', cat_id=cat.id) }}" style="display:inline;"
+                                onsubmit="return confirmDeleteCategory('{{ cat.name_ar }}', {{ cat.product_count }})">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
                             </form>
@@ -80,4 +81,15 @@
         </form>
     </div></div>
 </div>
+
+{% block extra_js %}
+<script>
+function confirmDeleteCategory(name, productCount) {
+    if (productCount > 0) {
+        return confirm('⚠️ تحذير!\n\nأنت على وشك حذف تصنيف "' + name + '"\n\nسيتم حذف ' + productCount + ' منتج معه نهائياً ولا يمكن التراجع عن هذا الإجراء.\n\nهل أنت متأكد؟');
+    }
+    return confirm('هل أنت متأكد من حذف تصنيف "' + name + '"؟');
+}
+</script>
+{% endblock %}
 {% endblock %}

@@ -284,13 +284,16 @@ def category_delete(cat_id):
     if cat.subcategories.count() > 0:
         flash('لا يمكن حذف تصنيف يحتوي على فئات فرعية، احذف الفئات الفرعية أولاً', 'error')
         return redirect(url_for('admin_bp.categories_list'))
-    # Count all products (active + inactive)
-    all_products = Product.query.filter_by(category_id=cat.id).count()
-    if all_products > 0:
-        flash('لا يمكن حذف تصنيف يحتوي على منتجات', 'error')
+    # Delete all products in this category first
+    products = Product.query.filter_by(category_id=cat.id).all()
+    product_count = len(products)
+    for p in products:
+        db.session.delete(p)
+    db.session.delete(cat)
+    db.session.commit()
+    if product_count:
+        flash(f'تم حذف التصنيف وجميع منتجاته ({product_count} منتج)', 'success')
     else:
-        db.session.delete(cat)
-        db.session.commit()
         flash('تم حذف التصنيف', 'success')
     return redirect(url_for('admin_bp.categories_list'))
 
