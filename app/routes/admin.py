@@ -281,18 +281,23 @@ def category_edit(cat_id):
 @login_required
 def category_delete(cat_id):
     cat = Category.query.get_or_404(cat_id)
-    if cat.subcategories.count() > 0:
-        flash('لا يمكن حذف تصنيف يحتوي على فئات فرعية، احذف الفئات الفرعية أولاً', 'error')
-        return redirect(url_for('admin_bp.categories_list'))
-    # Delete all products in this category first
+    product_count = 0
+    # Delete subcategories and their products first
+    for sub in cat.subcategories.all():
+        sub_products = Product.query.filter_by(category_id=sub.id).all()
+        product_count += len(sub_products)
+        for p in sub_products:
+            db.session.delete(p)
+        db.session.delete(sub)
+    # Delete products in the parent category
     products = Product.query.filter_by(category_id=cat.id).all()
-    product_count = len(products)
+    product_count += len(products)
     for p in products:
         db.session.delete(p)
     db.session.delete(cat)
     db.session.commit()
     if product_count:
-        flash(f'تم حذف التصنيف وجميع منتجاته ({product_count} منتج)', 'success')
+        flash(f'تم حذف التصنيف وجميع فئاته الفرعية ومنتجاته ({product_count} منتج)', 'success')
     else:
         flash('تم حذف التصنيف', 'success')
     return redirect(url_for('admin_bp.categories_list'))
